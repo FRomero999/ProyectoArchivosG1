@@ -3,6 +3,10 @@ package org.example;
 import org.example.services.ConfigService;
 import org.example.services.FileService;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
 /**
  * Clase principal de la aplicación.
  *
@@ -26,6 +30,18 @@ public class App {
 
         ConfigService configService = new ConfigService();
         FileService fileService = new FileService(configService);
-        fileService.leerArchivoTextoFiltrado("Samsung").forEach(System.out::println);
+
+        //var productos = fileService.leerArchivoTextoFiltrado("samsung");
+        //fileService.guardarArchivoJson("exportacion.json", productos);
+
+        var productos = fileService.leerArchivoJson("exportacion.json");
+
+        try(var oos = new ObjectOutputStream( new FileOutputStream("exportacion.bin")) ) {
+            oos.writeObject(productos);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
     }
 }

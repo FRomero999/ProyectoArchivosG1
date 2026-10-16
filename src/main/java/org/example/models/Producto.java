@@ -1,5 +1,7 @@
 package org.example.models;
 
+import java.io.Serializable;
+
 /**
  * Modelo de datos que representa un producto en el sistema.
  *
@@ -19,6 +21,7 @@ public record Producto(
         /**
          * Nombre descriptivo del producto.
          */
+
         String nombre,
 
         /**
@@ -32,7 +35,7 @@ public record Producto(
          * Debe ser mayor o igual a 0.
          */
         Integer stock
-) {
+) implements Serializable {
 
     /**
      * Constructor compacto del record que valida los datos de entrada.

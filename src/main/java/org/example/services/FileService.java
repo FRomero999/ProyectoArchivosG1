@@ -1,6 +1,9 @@
 package org.example.services;
 
 import org.example.models.Producto;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -165,6 +168,61 @@ public class FileService {
         }
         return salida;
     }
+
+
+    /**
+     * Guarda una lista de productos en un archivo JSON con formato pretty.
+     *
+     * <p><strong>API utilizada:</strong> Jackson 3 - {@link tools.jackson.databind.ObjectMapper}
+     * junto con {@code writerWithDefaultPrettyPrinter()} para generar el JSON legible.</p>
+     *
+     * @param filename  Nombre del archivo JSON a crear/ sobrescribir
+     * @param productos Lista de productos a guardar
+     * @throws IllegalArgumentException Si el nombre del archivo o la lista son nulos
+     * @throws RuntimeException Si ocurre un error durante la escritura
+     */
+    public void guardarArchivoJson(String filename, List<Producto> productos) {
+        if (filename == null || fileName.isBlank()) {
+            throw new IllegalArgumentException("El archivo no puede ser nulo");
+        }
+        if (productos == null) {
+            throw new IllegalArgumentException("La lista no puede ser nula");
+        }
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.writerWithDefaultPrettyPrinter().writeValue(Path.of(filename), productos);
+        } catch (JacksonException e) {
+            throw new RuntimeException("Error al guardar el archivo JSON", e);
+        }
+    }
+
+    /**
+     * Lee una lista de productos desde un archivo JSON utilizando Jackson 3.
+     *
+     * <p><strong>API utilizada:</strong> Jackson 3 - {@link tools.jackson.databind.ObjectMapper}
+     * junto con {@link TypeReference} para deserializar el JSON en una
+     * {@code List<Producto>}.</p>
+     *
+     * @param filename Nombre del archivo JSON a leer
+     * @return Lista de productos leídos del archivo
+     * @throws IllegalArgumentException Si el nombre del archivo es nulo o vacío
+     * @throws RuntimeException Si el archivo no existe o ocurre un error durante la lectura
+     */
+    public List<Producto> leerArchivoJson(String filename) {
+        if (filename == null || filename.isBlank()) {
+            throw new IllegalArgumentException("El archivo no puede ser nulo");
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(new FileReader(filename),
+                    new TypeReference<ArrayList<Producto>>() { });
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("El archivo no existe: " + filename, e);
+        } catch (JacksonException e) {
+            throw new RuntimeException("Error al leer el archivo JSON", e);
+        }
+    }
+
 
     /* Métodos auxiliares */
 
