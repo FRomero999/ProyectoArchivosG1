@@ -5,12 +5,7 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -224,6 +219,54 @@ public class FileService {
     }
 
 
+    /**
+     * Guarda una lista de productos en un archivo binario mediante serialización.
+     *
+     * <p><strong>API utilizada:</strong> Java IO - {@link ObjectOutputStream} + {@link FileOutputStream}
+     * para escribir los objetos directamente en disco.</p>
+     *
+     * <p><strong>Requisito:</strong> Los objetos deben implementar {@link java.io.Serializable}.</p>
+     *
+     * @param fileName  Ruta del archivo binario a crear/sobrescribir
+     * @param productos Lista de productos a guardar
+     * @throws RuntimeException Si ocurre un error durante la escritura
+     */
+    public void guardarArchivoBinario(String fileName, List<Producto> productos) {
+        try(var oos = new ObjectOutputStream( new FileOutputStream(fileName)) ) {
+            oos.writeObject(productos);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Lee una lista de productos desde un archivo binario mediante deserialización.
+     *
+     * <p><strong>API utilizada:</strong> Java IO - {@link ObjectInputStream} + {@link FileInputStream}
+     * para reconstruir los objetos previamente serializados.</p>
+     *
+     * <p><strong>Requisito:</strong> El archivo debe haber sido generado con
+     * {@link #guardarArchivoBinario(String, List)} y los objetos contenidos deben
+     * implementar {@link java.io.Serializable}.</p>
+     *
+     * @param fileName Ruta del archivo binario a leer
+     * @return Lista de productos leídos del archivo
+     * @throws IllegalArgumentException Si el nombre del archivo es nulo o vacío
+     * @throws RuntimeException Si el archivo no existe o ocurre un error durante la lectura
+     */
+    public List<Producto> leerArchivoBinario(String fileName) {
+        if (fileName == null || fileName.isBlank()) {
+            throw new IllegalArgumentException("El archivo no puede ser nulo");
+        }
+        try (var ois = new ObjectInputStream(new FileInputStream(fileName))) {
+            return (List<Producto>) ois.readObject();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("El archivo no existe: " + fileName, e);
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("Error al leer el archivo binario", e);
+        }
+    }
+
     /* Métodos auxiliares */
 
     /**
@@ -250,5 +293,7 @@ public class FileService {
                 Integer.parseInt(campos[3])
         );
     }
+
+
     
 }

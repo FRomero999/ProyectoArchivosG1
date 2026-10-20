@@ -1,11 +1,13 @@
 package org.example;
 
+import org.example.models.Producto;
 import org.example.services.ConfigService;
 import org.example.services.FileService;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.List;
 
 /**
  * Clase principal de la aplicación.
@@ -34,14 +36,16 @@ public class App {
         //var productos = fileService.leerArchivoTextoFiltrado("samsung");
         //fileService.guardarArchivoJson("exportacion.json", productos);
 
-        var productos = fileService.leerArchivoJson("exportacion.json");
+        //var productos = fileService.leerArchivoJson("exportacion.json");
 
-        try(var oos = new ObjectOutputStream( new FileOutputStream("exportacion.bin")) ) {
-            oos.writeObject(productos);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        //fileService.guardarArchivoBinario("exportacion.bin",productos);
+
+        var productos = fileService.leerArchivoBinario("exportacion.bin");
+        productos.forEach(System.out::println);
 
 
     }
+
+
+
 }
